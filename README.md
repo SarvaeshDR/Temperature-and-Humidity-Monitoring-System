@@ -56,8 +56,165 @@ A DHT11 or DHT22 sensor can be interfaced with a Raspberry Pi to obtain real-tim
 9. Otherwise, display a normal environmental condition message.
 10. Display the readings on the application screen.
 11. Stop.
+# PROGRAM
+XML
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".MainActivity">
+
+    <EditText
+        android:id="@+id/etTemperature"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Enter Temperature (°C)"
+        android:inputType="numberSigned|numberDecimal"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="32dp" />
+
+    <EditText
+        android:id="@+id/etHumidity"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Enter Humidity (%)"
+        android:inputType="numberSigned|numberDecimal"
+        app:layout_constraintTop_toBottomOf="@+id/etTemperature"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/btnCheck"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Check Readings"
+        app:layout_constraintTop_toBottomOf="@+id/etHumidity"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp" />
+
+    <TextView
+        android:id="@+id/tvTemperature"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Temperature: --"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@+id/btnCheck"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="32dp" />
+
+    <TextView
+        android:id="@+id/tvHumidity"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Humidity: --"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@+id/tvTemperature"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="System Status: NORMAL"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@+id/tvHumidity"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+KT
+package com.example.temperatureandhumiditymonitoringwithgraphicaldisplayofsensorreadings
+
+import android.app.Activity
+import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
+
+class MainActivity : Activity() {
+    private lateinit var etTemperature: EditText
+    private lateinit var etHumidity: EditText
+    private lateinit var btnCheck: Button
+    private lateinit var tvTemperature: TextView
+    private lateinit var tvHumidity: TextView
+    private lateinit var tvStatus: TextView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        etTemperature = findViewById(R.id.etTemperature)
+        etHumidity = findViewById(R.id.etHumidity)
+        btnCheck = findViewById(R.id.btnCheck)
+        tvTemperature = findViewById(R.id.tvTemperature)
+        tvHumidity = findViewById(R.id.tvHumidity)
+        tvStatus = findViewById(R.id.tvStatus)
+
+        btnCheck.setOnClickListener { checkReadings() }
+    }
+
+    private fun checkReadings() {
+        val tempInput = etTemperature.text.toString().trim()
+        val humidityInput = etHumidity.text.toString().trim()
+
+        if (tempInput.isEmpty() || humidityInput.isEmpty()) {
+            Toast.makeText(
+                this,
+                "Please enter both readings",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
+        try {
+            val temperature = tempInput.toDouble()
+            val humidity = humidityInput.toDouble()
+
+            if (temperature < -50 || temperature > 100 || humidity < 0 || humidity > 100) {
+                Toast.makeText(
+                    this,
+                    "Enter valid sensor readings",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return
+            }
+
+            tvTemperature.text = "Temperature: $temperature °C"
+            tvHumidity.text = "Humidity: $humidity %"
+
+            if (temperature > 35 || humidity > 70) {
+                tvStatus.text = "WARNING: High Temperature or Humidity!"
+            } else {
+                tvStatus.text = "System Status: NORMAL"
+            }
+        } catch (_: NumberFormatException) {
+            Toast.makeText(
+                this,
+                "Invalid input",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+}
+
 
 ## 6. EXPECTED OUTPUT
+<img width="1862" height="1012" alt="Screenshot 2026-11-26 142035" src="https://github.com/user-attachments/assets/b485d513-ce42-45f5-ab9c-bacfcda2b285" />
+
 
 ## 7. APPLICATION FEATURES
 - User-friendly Android interface.
